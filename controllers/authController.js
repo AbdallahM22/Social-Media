@@ -9,6 +9,7 @@ const signToken = (id) => {
   });
 };
 
+// authentication
 exports.signup = async (req, res, next) => {
   const newUser = await User.create({
     name: req.body.name,
@@ -49,6 +50,7 @@ exports.login = async (req, res, next) => {
   });
 };
 
+// authorization
 exports.protect = async (req, res, next) => {
   // getting token
   let token;
@@ -93,4 +95,27 @@ exports.restrictTo = (...roles) => {
       );
     }
   };
+};
+
+// update user's password
+
+exports.updatePassword = async (req, res, next) => {
+  // Get user
+  const user = await User.findById(req.user.id).select("+password");
+  // check if current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError("Your current password is wrong"));
+  }
+  // update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+
+  await user.save();
+
+  // log user in, send token
+  const token = signToken(user._id);
+  res.status(statusCode).json({
+    status: "success",
+    token,
+  });
 };
