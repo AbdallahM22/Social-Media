@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const app = require("./app");
-// const app = require("./App");
 
 mongoose
   .connect(process.env.DB_URL + "social")
