@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please tell us your name!"],
+    minlength: [4, "password should be greater than or equal 4"],
   },
   email: {
     type: String,
@@ -30,9 +31,7 @@ const userSchema = new mongoose.Schema({
       message: "Passwords are not the same!",
     },
   },
-  photo: {
-    type: String,
-  },
+  photo: [String],
   passwordChangedAt: Date,
   role: {
     type: String,
