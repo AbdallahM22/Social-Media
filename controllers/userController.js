@@ -5,9 +5,6 @@ const User = require("../model/userModel");
 const cloudinary = require("../utils/cloudinary");
 
 const multerStorage = multer.diskStorage({
-  // destination: (req, file, cb) => {
-  //   cb(null, "public/img/users");
-  // },
   filename: (req, file, cb) => {
     const ext = file.mimetype.split("/")[1];
     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
@@ -60,35 +57,31 @@ exports.updateMe = async (req, res, next) => {
     );
   }
   // 2) Filtered out unwanted fields names that are not allowed to be updated
-  const filteredBody = filterObj(req.body, "name", "email");
-  // let upload;
+  let filteredBody = filterObj(req.body, "name", "email");
+  let upload;
+  // check if user upload image
   if (req.file) {
-    filteredBody.photo = req.file.filename;
-    console.log(req.file.path);
-    await cloudinary.v2.uploader.upload(req.file.path, {
-      public_id: "profile",
-    });
-    // try {
-    //   cloudinary.v2.uploader
-    //     .upload(req.file.path)
-    //     .then((result) => console.log(result))
-    //     .catch((err) => console.log(err));
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    upload = await cloudinary.v2.uploader.upload(req.file.path);
+
+    filteredBody = { ...filteredBody, $push: { photo: upload.url } };
   }
 
   // 3) Update user document
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true,
-  });
+
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    // filteredBody,
+    filteredBody,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
 
   res.status(200).json({
     status: "success",
     data: {
       user: updatedUser,
     },
-    // file: upload.secure_url,
   });
 };
