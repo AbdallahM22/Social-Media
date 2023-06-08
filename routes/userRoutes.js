@@ -6,8 +6,8 @@ const userController = require("../controllers/userController");
 const router = express.Router();
 
 // authentication
-router.post("/signup", authController.validateSignup, authController.signup);
-router.post("/login", authController.validateLogin, authController.login);
+router.post("/signup", authController.signup);
+router.post("/login", authController.login);
 
 // crud
 // get all users
