@@ -10,6 +10,21 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 
 // crud
-router.get("/", userController.getAllUsers);
+// get all users
+router.get("/", authController.protect, userController.getAllUsers);
+
+// update user's password
+router.patch(
+  "/updateMyPassword",
+  authController.protect,
+  authController.updatePassword
+);
+
+router.patch(
+  "/updateMe",
+  authController.protect,
+  userController.uploadUserPhoto,
+  userController.updateMe
+);
 
 module.exports = router;

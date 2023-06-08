@@ -102,6 +102,10 @@ exports.restrictTo = (...roles) => {
 exports.updatePassword = async (req, res, next) => {
   // Get user
   const user = await User.findById(req.user.id).select("+password");
+  const { passwordCurrent, password, passwordConfirm } = req.body;
+
+  if (!passwordCurrent || !password || !passwordConfirm)
+    return next(new AppError("enter password fields"));
   // check if current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
     return next(new AppError("Your current password is wrong"));
@@ -114,7 +118,7 @@ exports.updatePassword = async (req, res, next) => {
 
   // log user in, send token
   const token = signToken(user._id);
-  res.status(statusCode).json({
+  res.status(200).json({
     status: "success",
     token,
   });
