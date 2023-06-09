@@ -2,10 +2,12 @@ const express = require('express');
 require('dotenv').config();
 require('express-async-errors');
 
+
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const userRouter = require('./routes/userRoutes');
 const postsRouter = require('./routes/postsRoutes');
+const commentRoute=require('./routes/commentsRouter')
 const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
@@ -15,10 +17,12 @@ app.use(express.json());
 app.use(express.urlencoded());
 
 
-// routes
+
 app.use('/users', userRouter);
 app.use('/posts', postsRouter);
+app.use('/comment',commentRoute)
 app.use('/reviews', reviewRouter);
+
 
 // not found pages
 app.all('*', (req, res, next) => {
@@ -27,3 +31,12 @@ app.all('*', (req, res, next) => {
 //global error handling
 app.use(globalErrorHandler);
 module.exports = app;
+
+
+
+
+
+
+
+
+
