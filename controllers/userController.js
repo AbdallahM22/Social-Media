@@ -98,3 +98,16 @@ exports.getUser = async (req, res, next) => {
     },
   });
 };
+
+exports.deleteUser = async (req, res, next) => {
+  const { id } = req.params;
+
+  await User.deleteOne({ _id: id });
+
+  res.status(204).json({
+    status: "success",
+    // data: {
+    //   user,
+    // },
+  });
+};

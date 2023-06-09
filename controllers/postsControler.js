@@ -1,5 +1,5 @@
-const Post = require('../model/postModel');
-const AppError = require('../utils/appError');
+const Post = require("../model/postModel");
+const AppError = require("../utils/appError");
 
 const allPosts = async (req, res, next) => {
   res.send(await Post.find());
@@ -14,7 +14,7 @@ const getUserPosts = async (req, res, next) => {
 const createPost = async (req, res, next) => {
   const { text, userId } = req.body;
   if (!text || !userId)
-    return next(new AppError('please provide post text and user Id !!', 400));
+    return next(new AppError("please provide post text and user Id !!", 400));
   const postCreated = new Post({ text, userId });
   await postCreated.save();
   res.send(postCreated);
@@ -26,7 +26,7 @@ const updatePost = async (req, res, next) => {
   if (!(await Post.findById(id)) || !text) {
     return next(
       new AppError(
-        'please provide New post Text In the Req Body and user Id as a Param !!',
+        "please provide New post Text In the Req Body and user Id as a Param !!",
         400
       )
     );
@@ -39,7 +39,7 @@ const deletePost = async (req, res, next) => {
   const { id } = req.params;
 
   if (!(await Post.findById(id))) {
-    return next(new AppError('No Post With That Id In DB !', 400));
+    return next(new AppError("No Post With That Id In DB !", 400));
   }
 
   await Post.findByIdAndDelete(id);

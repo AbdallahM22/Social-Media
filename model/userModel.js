@@ -60,6 +60,13 @@ userSchema.pre(/^find/, function (next) {
   next();
 });
 
+userSchema.pre("deleteOne", async function (next) {
+  let id = this.getQuery()["_id"];
+  await mongoose.model("Post").deleteMany({ userId: id });
+  await mongoose.model("Review").deleteMany({ userId: id });
+  next();
+});
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
@@ -79,8 +86,9 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
 
 userSchema.virtual("posts", {
   ref: "Post",
-  foreignField: "user",
+  foreignField: "userId",
   localField: "_id",
 });
+
 const User = mongoose.model("User", userSchema);
 module.exports = User;

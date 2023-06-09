@@ -1,7 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-require('express-async-errors');
+require("express-async-errors");
+
+const authController = require("../controllers/authController");
 
 // Post Model
 const {
@@ -10,7 +12,7 @@ const {
   allPosts,
   getUserPosts,
   deletePost,
-} = require('../controllers/postsControler');
+} = require("../controllers/postsControler");
 
 // const {
 //   getAllUsers,
@@ -25,10 +27,10 @@ const {
 // restfull api (users) crud create read update delete
 
 // read All
-router.get('/', allPosts);
+router.get("/", authController.protect, allPosts);
 
 // All Posts per userId
-router.get('/:userId', getUserPosts);
+router.get("/:userId", getUserPosts);
 
 // 1 -Find Post Per ID
 // router.get('/:userId?postId', async (req, res, next) => {
@@ -38,12 +40,12 @@ router.get('/:userId', getUserPosts);
 // });
 
 // create (Post)
-router.post('/', createPost);
+router.post("/", createPost);
 
 // Partialy Update
-router.patch('/:id', updatePost);
+router.patch("/:id", updatePost);
 
 // Delete Post
-router.delete('/:id', deletePost);
+router.delete("/:id", authController.restrictTo("admin"), deletePost);
 
 module.exports = router;
