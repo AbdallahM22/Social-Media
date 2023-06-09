@@ -6,6 +6,9 @@ mongoose
   .then(() => console.log("connected to db"))
   .catch((err) => console.log(err));
 
-app.listen(3000, "127.0.0.1", () => {
-  console.log("listenning successfully");
-});
+
+  app.listen(3000, "127.0.0.1", () => {
+    console.log("listenning successfully on Port 3000");
+  });
+
+module.exports=mongoose
