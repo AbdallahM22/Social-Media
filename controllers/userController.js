@@ -85,3 +85,16 @@ exports.updateMe = async (req, res, next) => {
     },
   });
 };
+
+exports.getUser = async (req, res, next) => {
+  const { id } = req.params;
+  console.log(id);
+  const user = await User.findById(id).populate("posts");
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      user,
+    },
+  });
+};
