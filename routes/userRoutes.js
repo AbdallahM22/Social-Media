@@ -27,4 +27,6 @@ router.patch(
   userController.updateMe
 );
 
+router.get("/:id", userController.getUser);
+
 module.exports = router;
