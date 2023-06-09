@@ -1,7 +1,29 @@
 const jwt = require("jsonwebtoken");
 const { promisify } = require("util");
+const Joi = require("joi");
 const User = require("../model/userModel");
 const AppError = require("../utils/appError");
+
+const signupSchema = Joi.object({
+  name: Joi.string().min(4).required(),
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+  passwordConfirm: Joi.string().min(8).required(),
+});
+exports.validateSignup = (req, res, next) => {
+  const { error } = signupSchema.validate(req.body);
+  if (error) next(new AppError(error.message, 400));
+  next();
+};
+const loginSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().min(8).required(),
+});
+exports.validateLogin = (req, res, next) => {
+  const { error } = loginSchema.validate(req.body);
+  if (error) next(new AppError(error.message, 400));
+  next();
+};
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -32,8 +54,8 @@ exports.signup = async (req, res, next) => {
 exports.login = async (req, res, next) => {
   const { email, password } = req.body;
 
-  if (!email || !password)
-    next(new AppError("Please provide email and password", 400));
+  // if (!email || !password)
+  //   next(new AppError("Please provide email and password", 400));
 
   const user = await User.findOne({ email }).select("+password");
   console.log(user);
@@ -94,6 +116,7 @@ exports.restrictTo = (...roles) => {
         new AppError("You do not have permission to perform this action", 403)
       );
     }
+    next();
   };
 };
 
@@ -102,6 +125,10 @@ exports.restrictTo = (...roles) => {
 exports.updatePassword = async (req, res, next) => {
   // Get user
   const user = await User.findById(req.user.id).select("+password");
+  const { passwordCurrent, password, passwordConfirm } = req.body;
+
+  if (!passwordCurrent || !password || !passwordConfirm)
+    return next(new AppError("enter password fields"));
   // check if current password is correct
   if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
     return next(new AppError("Your current password is wrong"));
@@ -114,7 +141,7 @@ exports.updatePassword = async (req, res, next) => {
 
   // log user in, send token
   const token = signToken(user._id);
-  res.status(statusCode).json({
+  res.status(200).json({
     status: "success",
     token,
   });
