@@ -3,7 +3,8 @@ const router = express.Router();
 
 require('express-async-errors');
 
-// Post Model
+const authController = require('../controllers/authController');
+
 const {
   createPost,
   updatePost,
@@ -12,38 +13,52 @@ const {
   deletePost,
 } = require('../controllers/postsControler');
 
-// const {
-//   getAllUsers,
-//   getUser,
-//   signup,
-//   editUser,
-//   partialyEditUser,
-//   deleteUser,
-// } = require('../controllers/authenticationController');
-// const { signupValidation } = require('../utils/authenticationScheama');
+// Get All Posts In Db ( admin Only )
+router.get(
+  '/',
+  authController.protect,
+  authController.restrictTo('admin'),
+  allPosts
+);
 
-// restfull api (users) crud create read update delete
+// All User Posts per userId ( averybody )
+router.get(
+  '/:userId',
+  authController.protect,
+  authController.restrictTo(['user', 'admin']),
+  getUserPosts
+);
 
-// read All
-router.get('/', allPosts);
-
-// All Posts per userId
-router.get('/:userId', getUserPosts);
-
+// Problem get('/:postId' or '/:userId'
 // 1 -Find Post Per ID
-// router.get('/:userId?postId', async (req, res, next) => {
+// router.get('/:postId', async (req, res, next) => {
 //   const { postId } = req.params;
 //   const userPosts = await Post.findOne({ _id: postId });
 //   res.send(userPosts);
 // });
 
-// create (Post)
-router.post('/', createPost);
+// Create Post By Only User
+router.post(
+  '/',
+  authController.protect,
+  authController.restrictTo('user'),
+  createPost
+);
 
-// Partialy Update
-router.patch('/:id', updatePost);
+// Edit Post By Only Post-Creator (User)
+router.patch(
+  '/:id',
+  authController.protect,
+  authController.restrictTo('user'),
+  updatePost
+);
 
-// Delete Post
-router.delete('/:id', deletePost);
+// Delete Post & it's comments & it's reviews using post Id ( only Admin )
+router.delete(
+  '/:id',
+  authController.protect,
+  authController.restrictTo('admin'),
+  deletePost
+);
 
 module.exports = router;

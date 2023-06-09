@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+
+require('express-async-errors');
+
+const authController = require('../controllers/authController');
 const {
   getAllReviews,
   postReviews,
@@ -8,23 +12,39 @@ const {
   deleteReview,
 } = require('../controllers/reviewController');
 
-require('express-async-errors');
-
-// Post Model
-
-// read All reviews in DB
+// Get All Reviwes In Db ( Development Purpose Only )
 router.get('/', getAllReviews);
 
-// All Reviwes per postId
-router.get('/:postId', postReviews);
+// Get All Reviwes per postId (averybody)
+router.get(
+  '/:postId',
+  authController.protect,
+  authController.restrictTo(['user', 'admin']),
+  postReviews
+);
 
-// create (Post)
-router.post('/', createReview);
+// Create Review By Only User
+router.post(
+  '/',
+  authController.protect,
+  authController.restrictTo('user'),
+  createReview
+);
 
-// Partialy Update
-router.patch('/:id', updateReview);
+// Edit Review By Only review-Creator (User)
+router.patch(
+  '/:id',
+  authController.protect,
+  authController.restrictTo(['user', 'admin']),
+  updateReview
+);
 
-// Delete Review
-router.delete('/:id', deleteReview);
+// Delete Review usng review_id only By Admin
+router.delete(
+  '/:id',
+  authController.protect,
+  authController.restrictTo('admin'),
+  deleteReview
+);
 
 module.exports = router;

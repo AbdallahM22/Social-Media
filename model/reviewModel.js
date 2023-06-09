@@ -12,17 +12,13 @@ const reviewSchema = new Schema({
     required: true,
   },
   userId: {
-    // type: Schema.Types.ObjectId,
-    // ref: 'User',
-    // required: true,
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
   postId: {
-    // type: Schema.Types.ObjectId,
-    // ref: 'User',
-    // required: true,
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'Post',
     required: true,
   },
 });

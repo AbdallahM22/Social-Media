@@ -7,11 +7,13 @@ const postSchema = new Schema({
     required: true,
   },
   userId: {
-    // type: Schema.Types.ObjectId,
-    // ref: 'User',
-    // required: true,
-    type: String,
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
+  },
+  created_at: {
+    type: Date,
+    default: Date.now(),
   },
 });
 
