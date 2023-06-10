@@ -20,6 +20,8 @@ const getReview = async (req, res, next) => {
 const createReview = async (req, res, next) => {
   const userId = req.user._id;
   const { text, rate, postId } = req.body;
+  const existedReview = await Review.findOne({ userId, postId });
+  if (existedReview) next(new AppError("you should review only one", 400));
   if (!rate || !postId) {
     return next(new AppError("All !rate || postId Is A Must", 400));
   }
