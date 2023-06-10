@@ -1,26 +1,27 @@
-const Review = require('../model/reviewModel');
-const AppError = require('../utils/appError');
+const Review = require("../model/reviewModel");
+const AppError = require("../utils/appError");
 
-// Get All Posts In Db ( Development Purpose Only )
+// Get All Reviews In Db ( Development Purpose Only )
 const getAllReviews = async (req, res, next) => {
   res.send(await Review.find());
 };
 
 // Get All Reviwes per postId (averybody)
-const postReviews = async (req, res, next) => {
-  const { postId } = req.params;
-  if (!(await Review.find({ postId: postId }))) {
-    return next(new AppError('No Post With that Id', 400));
-  }
+const getReview = async (req, res, next) => {
+  const { id } = req.params;
 
-  res.send(await Review.find({ postId: postId }));
+  const review = await Review.findById(id);
+  if (!review) next(new AppError("No Review With that Id", 400));
+
+  res.status(200).send(review);
 };
 
 // Create Review By Only User
 const createReview = async (req, res, next) => {
-  const { text, rate, userId, postId } = req.body;
-  if (!rate || !userId || !postId) {
-    return next(new AppError('All !rate || userId || postId Is A Must', 400));
+  const userId = req.user._id;
+  const { text, rate, postId } = req.body;
+  if (!rate || !postId) {
+    return next(new AppError("All !rate || postId Is A Must", 400));
   }
   const newReview = new Review({
     text: text,
@@ -37,7 +38,7 @@ const updateReview = async (req, res, next) => {
   const userId = req.user._id;
   const reviewId = req.params.id;
   !reviewId
-    ? next(new AppError('Review Id Is Required as a Parameter !!', 400))
+    ? next(new AppError("Review Id Is Required as a Parameter !!", 400))
     : null;
 
   const review = await Review.findById(reviewId);
@@ -50,7 +51,7 @@ const updateReview = async (req, res, next) => {
     await Review.findByIdAndUpdate(reviewId, { text: text, rate: rate });
     res.send(`Review With Id ${reviewId} , Edited Successfully`);
   } else {
-    res.send('You Are Not Authorized');
+    res.send("You Are Not Authorized");
   }
 };
 
@@ -58,7 +59,7 @@ const updateReview = async (req, res, next) => {
 const deleteReview = async (req, res, next) => {
   const reviewId = req.params.id;
   !reviewId
-    ? next(new AppError('Review Id Is Required as a Parameter !!', 400))
+    ? next(new AppError("Review Id Is Required as a Parameter !!", 400))
     : null;
 
   if (await Review.findByIdAndDelete(reviewId)) {
@@ -70,7 +71,7 @@ const deleteReview = async (req, res, next) => {
 
 module.exports = {
   getAllReviews,
-  postReviews,
+  getReview,
   createReview,
   updateReview,
   deleteReview,

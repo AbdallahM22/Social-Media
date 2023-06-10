@@ -1,6 +1,5 @@
-const AppError = require('../utils/appError');
-const Comment = require('../model/commentModel');
-const { error } = require('console');
+const AppError = require("../utils/appError");
+const Comment = require("../model/commentModel");
 
 // Create New Comment
 const createNewComment = async (req, res, next) => {
@@ -9,37 +8,30 @@ const createNewComment = async (req, res, next) => {
   if (!commentBody) return next(new AppError("Post Can't be Empty", 400));
   const newCommnet = new Comment({ commentBody, postId, userId });
   await newCommnet.save();
-  res.send(newCommnet);
+  res.status(201).send(newCommnet);
 };
 
 // Get All comments In Db ( Development Purpose Only )
 const getAllComments = async (req, res, next) => {
   const allComments = await Comment.find();
-  res.send(allComments);
+  res.status(200).send(allComments);
 };
 
-//Get the comments of sepcific post usng postId
-const getPostComments = async (req, res, next) => {
-  const { postId } = req.params;
-  const comments = await Comment.find({ postId: postId });
-  res.send(comments);
-};
 
 ////Get A comment using Comment Id
-// const getCommentById = async (req, res, next) => {
-//   const Id = req.params.id;
-//   console.log(Id);
-//   const comment = await Comment.findOne({ _id: Id });
-//   res.send(comment);
-// };
+const getCommentById = async (req, res, next) => {
+  const Id = req.params.id;
+  const comment = await Comment.findOne({ _id: Id });
+  res.status(200).send(comment);
+};
 
 //Delete A comment using Comment Id
 const deleteComment = async (req, res, next) => {
   const commentId = req.params.id;
   if (!(await Comment.findById(commentId)))
-    return next(new AppError('No Comment With That Id', 400));
+    return next(new AppError("No Comment With That Id", 400));
   Comment.findByIdAndRemove(commentId)
-    .then(res.send(`Comment with Id ${commentId} Has Been Deleted`))
+    .then(res.status(204).send(`Comment with Id ${commentId} Has Been Deleted`))
     .catch((error) => next(new AppError(error, 500)));
 };
 
@@ -60,17 +52,16 @@ const updateComment = async (req, res, next) => {
     await Comment.findByIdAndUpdate(req.params.id, {
       commentBody: commentBody,
     });
-    res.send(await Comment.findById(req.params.id));
+    res.status(200).send(await Comment.findById(req.params.id));
   } else {
-    res.send('Not Authorized To Update');
+    res.status(200).send("Not Authorized To Update");
   }
 };
 
 module.exports = {
   createNewComment,
   getAllComments,
-  getPostComments,
-  // getCommentById,
+  getCommentById,
   deleteComment,
   updateComment,
 };

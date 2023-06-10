@@ -41,5 +41,10 @@ router.get(
   authController.restrictTo("user", "admin"),
   userController.getUser
 );
-router.delete("/:id", userController.deleteUser);
+router.delete(
+  "/:id",
+  authController.protect,
+  authController.restrictTo("admin"),
+  userController.deleteUser
+);
 module.exports = router;

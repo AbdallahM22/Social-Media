@@ -3,6 +3,7 @@ const sharp = require("sharp");
 const User = require("../model/userModel");
 
 const cloudinary = require("../utils/cloudinary");
+const AppError = require("../utils/appError");
 
 const multerStorage = multer.diskStorage({
   filename: (req, file, cb) => {
@@ -68,15 +69,10 @@ exports.updateMe = async (req, res, next) => {
 
   // 3) Update user document
 
-  const updatedUser = await User.findByIdAndUpdate(
-    req.user.id,
-    // filteredBody,
-    filteredBody,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({
     status: "success",
@@ -88,7 +84,6 @@ exports.updateMe = async (req, res, next) => {
 
 exports.getUser = async (req, res, next) => {
   const { id } = req.params;
-  console.log(id);
   const user = await User.findById(id).populate("posts");
 
   res.status(200).json({
@@ -101,13 +96,13 @@ exports.getUser = async (req, res, next) => {
 
 exports.deleteUser = async (req, res, next) => {
   const { id } = req.params;
+  const user = await User.findById(id);
+
+  if (!user) next(new AppError("user is not found"), 400);
 
   await User.deleteOne({ _id: id });
 
-  res.status(204).json({
-    status: "success",
-    // data: {
-    //   user,
-    // },
+  res.status(204).send({
+    status: "deleted successfully",
   });
 };
