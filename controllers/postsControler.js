@@ -4,6 +4,7 @@ const User = require('../model/userModel');
 const Comment = require('../model/commentModel');
 const Review = require('../model/reviewModel');
 
+
 // Get All Posts In Db ( admin Only )
 const allPosts = async (req, res, next) => {
   res.send(await Post.find());
@@ -49,8 +50,9 @@ const deletePost = async (req, res, next) => {
   const postId = req.params.id;
   console.log(req.user);
 
-  if (!(await Post.findById(postId))) {
-    return next(new AppError('No Post With That Id In DB !', 400));
+
+  if (!(await Post.findById(id))) {
+    return next(new AppError("No Post With That Id In DB !", 400));
   }
 
   await Comment.deleteMany({ postId: postId });

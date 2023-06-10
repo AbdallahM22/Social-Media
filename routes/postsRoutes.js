@@ -1,7 +1,9 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-require('express-async-errors');
+require("express-async-errors");
+
+const authController = require("../controllers/authController");
 
 const authController = require('../controllers/authController');
 
@@ -11,7 +13,7 @@ const {
   allPosts,
   getUserPosts,
   deletePost,
-} = require('../controllers/postsControler');
+} = require("../controllers/postsControler");
 
 // Get All Posts In Db ( admin Only )
 router.get(
@@ -28,6 +30,7 @@ router.get(
   authController.restrictTo(['user', 'admin']),
   getUserPosts
 );
+
 
 // Problem get('/:postId' or '/:userId'
 // 1 -Find Post Per ID
@@ -60,5 +63,6 @@ router.delete(
   authController.restrictTo('admin'),
   deletePost
 );
+
 
 module.exports = router;
